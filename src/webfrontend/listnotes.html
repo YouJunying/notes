@@ -1,0 +1,136 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+
+<link rel="stylesheet" type="text/css"
+	href="static/h-ui/css/H-ui.min.css" />
+<link rel="stylesheet" type="text/css"
+	href="static/h-ui.admin/css/H-ui.admin.css" />
+<link rel="stylesheet" type="text/css"
+	href="static/Hui-iconfont/1.0.8/iconfont.css" />
+<link rel="stylesheet" type="text/css"
+	href="static/h-ui.admin/skin/default/skin.css" id="skin" />
+<link rel="stylesheet" type="text/css"
+	href="static/h-ui.admin/css/style.css" />
+<title>笔记列表</title>
+</head>
+<body>
+	<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 笔记管理 <span class="c-gray en">&gt;</span> 笔记列表 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+	<div class="page-container">
+		<div class="cl pd-5 bg-1 bk-gray mt-20"> <span class="l"><a href="javascript:;" onclick="admin_add('添加笔记','admin-add.html','800','500')" class="btn btn-primary radius"><i class="Hui-iconfont">&#xe600;</i> 添加笔记</a></span> <span class="r">共有数据：<strong id="count"></strong> 条</span> </div>
+		<table class="table table-border table-bordered table-bg">
+			<thead>
+			<tr>
+				<th scope="col" colspan="5">信息列表</th>
+			</tr>
+			<tr class="text-c">
+				<th width="100">ID</th>
+				<th width="150">标题</th>
+				<th width="150">内容</th>
+				<th>时间</th>
+				<th width="100">操作</th>
+			</tr>
+			</thead>
+			<tbody id="tbody1">
+			</tbody>
+		</table>
+	</div>
+
+	<script type="text/javascript" src="js/jquery-3.2.1.min.js"></script>
+	<script type="text/javascript" src="static/layer/2.4/layer.js"></script>
+	<script type="text/javascript" src="static/h-ui/js/H-ui.min.js"></script>
+	<script type="text/javascript" src="static/h-ui.admin/js/H-ui.admin.js"></script>
+	<script type="text/javascript" src="js/hospital.js"></script>
+
+	<!--请在下方写此页面业务相关的脚本-->
+	<script type="text/javascript"
+		src="js/My97DatePicker/4.8/WdatePicker.js"></script>
+	<script type="text/javascript"
+		src="js/datatables/1.10.0/jquery.dataTables.min.js"></script>
+	<script type="text/javascript" src="js/laypage/1.2/laypage.js"></script>
+	<script type="text/javascript">
+
+        $(()=>{
+            $.ajax({
+            url:HOST_URL+"queryall",
+            dataType:"json",
+            type:"get",
+            xhrFields:{
+                withCredentials:true
+            },
+            success:function (notes) {
+                if (notes!=null) {
+                    var trList = createTableBody(notes);
+                    $("#tbody1").html(trList);
+                    $("#count").html(notes.length);
+                }
+            }
+
+        })
+        })
+
+
+		//遍历每一行数据
+        function createTableBody(notes) {
+            var str = "";
+            $.each(notes, function (index, note) {
+                str += "<tr class='text-c'>"+ "<td id='id'>" + note.id + "</td>"
+                    + "<td id='title'>" + note.title + "</td>" + "<td id='content'>" + note.content + "</td>" +  "<td id='date'>"
+                    + note.time + "</td>" + "<td class='td-manage'>\n" +
+                    "<a title='编辑' href='javascript:;' onclick='admin_edit("+note.id+")' class='ml-5' style='text-\n" +
+                    "decoration:none'><i class='Hui-iconfont'>&#xe6df;</i></a> \n" +
+                    "<a title='删除' href='javascript:;' onclick='admin_del("+this+','+note.id+")' class='ml-5' style='text-\n" +
+                    "decoration:none'><i class='Hui-iconfont'>&#xe6e2;</i></a>\n" +
+                    "</td>" + "</tr>";
+
+            })
+            return str;
+        }
+
+
+		/*管理员-增加*/
+		function admin_add(title, url, w, h) {
+			layer_show("添加笔记", "addnotes.html", w, h);
+		}
+
+		/*管理员-删除*/
+		function admin_del(id) {
+			layer.confirm('确认要删除吗？', function(index) {
+
+                $.ajax({
+                    url:HOST_URL+'deleteNote/'+id,
+                    dataType:'json',
+                    type:'delete',
+                    xhrFields:{
+                        withCredentials:true
+                    },
+                    success:function (data) {
+                        layer.msg('已删除!',{icon:1,time:1000});
+                    }
+
+                })
+			});
+		}
+
+		/*管理员-编辑*/
+		function admin_edit(id) {
+			layer_show("笔记修改", "addnotes.html", 800, 500);
+			 $.ajax({
+				    url:"deletePatients",
+				    type: "post",
+				    dataType: "json",
+				    data:{
+				     "id":id,
+				     "name":"myname",
+				    },
+				    success: function (data) {
+				        console.log('修改成功');
+				    }.bind(this),
+				    error: function (xhr, status, err) {
+				    }.bind(this)
+				  });
+		}
+	</script>
+</body>
+</html>
